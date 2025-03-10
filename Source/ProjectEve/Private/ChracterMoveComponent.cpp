@@ -2,6 +2,8 @@
 
 
 #include "ChracterMoveComponent.h"
+#include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
+#include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedPlayerInput.h"
 
 // Sets default values for this component's properties
 UChracterMoveComponent::UChracterMoveComponent()
@@ -13,14 +15,13 @@ UChracterMoveComponent::UChracterMoveComponent()
 	// ...
 }
 
-
 // Called when the game starts
 void UChracterMoveComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
 	// ...
-	
+
 }
 
 
@@ -30,5 +31,28 @@ void UChracterMoveComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void UChracterMoveComponent::SetupInputBinding(class UEnhancedInputComponent* input)
+{
+	Super::SetupInputBinding(input);
+
+	input->BindAction(IA_L_Stick, ETriggerEvent::Triggered, this, &UChracterMoveComponent::LookUp);
+	input->BindAction(IA_R_Stick, ETriggerEvent::Triggered, this, &UChracterMoveComponent::Move);
+
+}
+
+void UChracterMoveComponent::LookUp(const struct FInputActionValue& InputValue)
+{
+	FVector2D valuse = InputValue.Get<FVector2D>();
+
+	//UE_LOG(LogTemp, Log, TEXT("Look: %f %f"), valuse.X, valuse.Y);
+}
+
+void UChracterMoveComponent::Move(const struct FInputActionValue& InputValue)
+{
+	FVector2D valuse = InputValue.Get<FVector2D>();
+
+	UE_LOG(LogTemp, Log, TEXT("Move: %f %f"), valuse.X, valuse.Y);
 }
 
