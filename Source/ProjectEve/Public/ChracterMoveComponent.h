@@ -24,20 +24,20 @@ protected:
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-
 private:
-	//class UInputComponent*
-
-public:
+	float currentTime=0.0f;
+protected:
 	//인풋 바인딩 함수
 	void SetupInputBinding(class UEnhancedInputComponent* input) override;
-
+private:
 	//카메라 시선 입력 함수
 	void LookUp(const struct FInputActionValue& InputValue);
 
 	//캐릭터 무브 입력 함수
 	void Move(const struct FInputActionValue& InputValue);
+
+	void RunCheck();
+
 
 public:
 	UPROPERTY(EditDefaultsOnly,Category="Input")
@@ -45,5 +45,4 @@ public:
 
 	UPROPERTY(EditDefaultsOnly,Category="Input")
 	class UInputAction* IA_R_Stick;
-
 };

@@ -27,14 +27,20 @@ AEve::AEve()
 	}
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	springArmComp->SetupAttachment(CapsuleComp);
-	springArmComp->SetRelativeLocation(FVector(0, 60, 80));
+	springArmComp->SetRelativeLocation(FVector(0, 0, 90));
+	springArmComp->bUsePawnControlRotation = true;
 
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	cameraComp->SetupAttachment(springArmComp);
+	cameraComp->bUsePawnControlRotation = false;
 
 	BaseComp = CreateDefaultSubobject<UCharacterBaseComponent>(TEXT("BaseComp"));
 	ActionComp = CreateDefaultSubobject<UActionComponent>(TEXT("ActionComp"));
 	MoveComp = CreateDefaultSubobject<UChracterMoveComponent>(TEXT("MoveComp"));
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = true;
+	bUseControllerRotationRoll = false;
 
 }
 

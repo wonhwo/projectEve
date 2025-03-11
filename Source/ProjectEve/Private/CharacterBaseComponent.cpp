@@ -20,6 +20,8 @@ void UCharacterBaseComponent::SetupInputBinding(class UEnhancedInputComponent* i
 }
 
 
+
+
 void UCharacterBaseComponent::InitializeComponent()
 {
 
@@ -33,7 +35,6 @@ void UCharacterBaseComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	Eve = Cast<AEve>(GetOwner());
-
 	// ...
 
 }
@@ -43,6 +44,9 @@ void UCharacterBaseComponent::BeginPlay()
 void UCharacterBaseComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	Velocity = Eve->GetVelocity().Size();
+
 
 	// ...
 }
