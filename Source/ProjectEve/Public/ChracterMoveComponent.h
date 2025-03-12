@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "CharacterBaseComponent.h"
+#include "EMoveState.h"
 #include "ChracterMoveComponent.generated.h"
 
 
@@ -26,9 +27,17 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 private:
 	float currentTime=0.0f;
+
+	bool isRun = true;
+
+	EMoveState MoveState = EMoveState::STOP;
+
+	FVector InputPlayerVector;
+	FVector InputCamVector;
 protected:
 	//인풋 바인딩 함수
 	void SetupInputBinding(class UEnhancedInputComponent* input) override;
+
 private:
 	//카메라 시선 입력 함수
 	void LookUp(const struct FInputActionValue& InputValue);
@@ -38,6 +47,15 @@ private:
 
 	void RunCheck();
 
+	void Jump();
+
+	void Movestart();
+
+	void Movestop();
+
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	void GetMovementAngle();
+
 
 public:
 	UPROPERTY(EditDefaultsOnly,Category="Input")
@@ -45,4 +63,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly,Category="Input")
 	class UInputAction* IA_R_Stick;
+
+	UPROPERTY(EditDefaultsOnly,Category="Input")
+	class UInputAction* IA_Jump;
 };

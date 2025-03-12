@@ -15,19 +15,20 @@
 // Sets default values
 AEve::AEve()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	ConstructorHelpers::FObjectFinder<USkeletalMesh>MeshTemp(TEXT("/Script/Engine.SkeletalMesh'/Game/Mesh/SK_Eve.SK_Eve'"));
 
 	if (MeshTemp.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(MeshTemp.Object);
-		GetMesh()->SetRelativeLocationAndRotation(FVector(0,0,-86),FRotator(0,-90,0));
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -86), FRotator(0, -90, 0));
 
 	}
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	springArmComp->SetupAttachment(CapsuleComp);
 	springArmComp->SetRelativeLocation(FVector(0, 0, 90));
+	springArmComp->bEnableCameraLag = true;
 	springArmComp->bUsePawnControlRotation = true;
 
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
@@ -37,11 +38,6 @@ AEve::AEve()
 	BaseComp = CreateDefaultSubobject<UCharacterBaseComponent>(TEXT("BaseComp"));
 	ActionComp = CreateDefaultSubobject<UActionComponent>(TEXT("ActionComp"));
 	MoveComp = CreateDefaultSubobject<UChracterMoveComponent>(TEXT("MoveComp"));
-
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = true;
-	bUseControllerRotationRoll = false;
-
 }
 
 // Called when the game starts or when spawned

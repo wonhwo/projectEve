@@ -3,6 +3,7 @@
 
 #include "CharacterBaseComponent.h"
 #include "Eve.h"
+#include "AnimEve.h"
 
 // Sets default values for this component's properties
 UCharacterBaseComponent::UCharacterBaseComponent()
@@ -35,6 +36,7 @@ void UCharacterBaseComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	Eve = Cast<AEve>(GetOwner());
+	Anim = Cast<UAnimEve>(Eve->GetMesh()->GetAnimInstance());
 	// ...
 
 }

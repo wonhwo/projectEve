@@ -42,6 +42,9 @@ protected:
 	UPROPERTY()
 	float Velocity;
 
+	UPROPERTY()
+	class UAnimEve* Anim;
+
 public:
 	virtual void SetupInputBinding(class UEnhancedInputComponent* input);
 
