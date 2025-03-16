@@ -10,6 +10,7 @@
 UENUM(BlueprintType)
 enum class EMoveState:uint8
 {
+	IDLE UMETA(DisplayName = "IDLE"),
 	STOP UMETA(DisplayName = "STOP"),
 	WALK UMETA(DisplayName = "WALK"),
 	RUN UMETA(DisplayName = "RUN"),

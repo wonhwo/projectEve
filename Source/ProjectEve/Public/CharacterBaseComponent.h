@@ -30,20 +30,23 @@ protected:
 	UPROPERTY()
 	class AEve* Eve;
 
-	UPROPERTY()
-	FVector Direction;
+
 
 	UPROPERTY()
 	float Speed;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float MaxSpeed=800;
+	float MaxSpeed=600;
 
 	UPROPERTY()
 	float Velocity;
 
 	UPROPERTY()
 	class UAnimEve* Anim;
+
+public:
+	UPROPERTY()
+	FVector Direction;
 
 public:
 	virtual void SetupInputBinding(class UEnhancedInputComponent* input);

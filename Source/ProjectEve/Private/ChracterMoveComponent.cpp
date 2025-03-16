@@ -45,11 +45,27 @@ void UChracterMoveComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		Eve->AddMovementInput(WorldDirection,Direction.Size());
 
 		Direction = FVector::ZeroVector;
+
 	}
+    //가속도 계산
+    {
+        FVector CurrentVelocity = Eve->GetCharacterMovement()->Velocity;
 
-	//GetMovementAngle();
+        PreviousVelocity = CurrentVelocity;
+        PreviousSpeed = CurrentVelocity.Size();
+
+        if (DeltaTime > 0.f)
+        {
+            Acceleration = (CurrentVelocity.Size() - PreviousSpeed) / DeltaTime;
+        }
+        else
+        {
+            Acceleration = 0.f;
+        }
+    }
+    Anim->PreviousSpeed = PreviousSpeed;
+
 }
-
 void UChracterMoveComponent::SetupInputBinding(class UEnhancedInputComponent* input)
 {
 	Super::SetupInputBinding(input);
@@ -60,8 +76,9 @@ void UChracterMoveComponent::SetupInputBinding(class UEnhancedInputComponent* in
 
 	input->BindAction(IA_Jump, ETriggerEvent::Started, this, &UChracterMoveComponent::Jump);
 
-	input->BindAction(IA_L_Stick, ETriggerEvent::Started, this, &UChracterMoveComponent::Movestart);
+	input->BindAction(IA_L_Stick, ETriggerEvent::Started, this, &UChracterMoveComponent::OnMoveStarted);
 	input->BindAction(IA_L_Stick, ETriggerEvent::Completed, this, &UChracterMoveComponent::Movestop);
+	input->BindAction(IA_L_StickClick, ETriggerEvent::Started, this, &UChracterMoveComponent::StartSprint);
 
 }
 
@@ -81,39 +98,54 @@ void UChracterMoveComponent::LookUp(const struct FInputActionValue& InputValue)
 
 void UChracterMoveComponent::Move(const struct FInputActionValue& InputValue)
 {
-	FVector2D valuse = InputValue.Get<FVector2D>();
-	//방향백터 구하기
-	Direction.X = valuse.Y;
-	Direction.Y = valuse.X;
+    FVector2D values = InputValue.Get<FVector2D>();
+    Direction.X = values.Y; // Forward
+    Direction.Y = values.X; // Right
 
-	MoveState = EMoveState::WALK;
+    if (Direction.SizeSquared() > 0.0f)
+    {
+        FVector CharacterForward = Eve->GetActorForwardVector();
+        CurrentCharacterAngle = FMath::Atan2(CharacterForward.Y, CharacterForward.X);
+        CurrentCharacterAngle = FMath::RadiansToDegrees(CurrentCharacterAngle);
 
-	FTimerHandle RunCheckTimer;
-	//스틱 기울기에 따라 속도 최대치로 도달시 최대치 도달 2초후 하이퍼 달리기 발동
-	if (Velocity == Eve->GetMovementComponent()->GetMaxSpeed()) {
-		currentTime += GetWorld()->DeltaTimeSeconds;
-		isRun = false;
+        FRotator ControlRotation = Eve->GetController()->GetControlRotation();
+        FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
+        FVector InputWorldDirection = FRotationMatrix(YawRotation).TransformVector(FVector(Direction.X, Direction.Y, 0.f));
 
-		if (currentTime >= 2)RunCheck();
-	}
-	//스틱 기울기가 조금이라도 내려가면 하이퍼 달리기 종료
-	if(Direction.Size()<=1.0f){
-		isRun = true;
-		currentTime = 0.0f;
-		Eve->GetCharacterMovement()->MaxWalkSpeed = 800;
-	}
+        InputAngle = FMath::Atan2(InputWorldDirection.Y, InputWorldDirection.X);
+        InputAngle = FMath::RadiansToDegrees(InputAngle);
 
+        // 두 방향 간의 각도 차이
+        AngleDifference = FMath::FindDeltaAngleDegrees(CurrentCharacterAngle, InputAngle);
+    }
 
+    StickMagnitude = Direction.Size(); // 0~1
 
+    FTimerHandle RunCheckTimer;
+    if (Velocity == Eve->GetMovementComponent()->GetMaxSpeed())
+    {
+        currentTime += GetWorld()->DeltaTimeSeconds;
+        isRun = false;
+
+        if (currentTime >= 5 && Velocity == 800.0f)
+        {
+            RunCheck();
+        }
+    }
+
+    if (StickMagnitude <= 0.5f)
+    {
+        isRun = true;
+        currentTime = 0.0f;
+        Eve->GetCharacterMovement()->MaxWalkSpeed = 600;
+    }
 }
 //하이퍼 달리기 발동 함수
 void UChracterMoveComponent::RunCheck()
 {
 	if (isRun)return;
 	Eve->GetCharacterMovement()->MaxWalkSpeed = 1600;
-	MoveState = EMoveState::RUN;
 
-	UE_LOG(LogTemp, Log, TEXT("Run"));
 }
 
 void UChracterMoveComponent::Jump()
@@ -121,57 +153,22 @@ void UChracterMoveComponent::Jump()
 	Eve->Jump();
 }
 
-void UChracterMoveComponent::Movestart()
+void UChracterMoveComponent::OnMoveStarted(const FInputActionValue& Value)
 {
-	MoveState = EMoveState::START;
-
+    if(Anim->movementType==EMoveState::IDLE)
+	    Anim->movementType = EMoveState::WALK;
 }
 
 void UChracterMoveComponent::Movestop()
 {
-	MoveState = EMoveState::STOP;
+    if (Anim->movementType == EMoveState::WALK)
+	    Anim->movementType = EMoveState::STOP;
 }
 
-void UChracterMoveComponent::GetMovementAngle()
+void UChracterMoveComponent::StartSprint()
 {
+	Eve->GetCharacterMovement()->MaxWalkSpeed = 800;
+	currentTime = 0.0f;
 
-	UAnimEve* AnimIn = Cast<UAnimEve>(Eve->GetMesh()->GetAnimInstance());
-	AnimIn->MoveState = this->MoveState;
-
-	APlayerController* playerContoller = Cast<APlayerController>(Eve->GetController());
-
-	FVector velocity = Eve->GetVelocity();
-
-	FRotator rot = FRotator(0, Eve->GetControlRotation().Yaw, 0);
-
-	float direction = AnimIn->CalculateDirection(velocity, rot);
-
-	//(UKismetAnimationLibrary::CalculateDirection(velocity, Eve->GetControlRotation()));
-
-	//InputPlayerVector = Eve->GetActorForwardVector();
-	//InputCamVector = playerContoller->GetControlRotation().Vector();
-
-	//// 3. 두 벡터 사이의 각도 계산
-	//float DotProduct = FVector::DotProduct(InputPlayerVector, InputCamVector);
-	//DotProduct = FMath::Clamp(DotProduct, -1.0f, 1.0f);
-	//float AngleRadians = FMath::Acos(DotProduct);
-	//float AngleDegrees = FMath::RadiansToDegrees(AngleRadians);
-	//FVector CrossProduct = FVector::CrossProduct(InputPlayerVector, InputCamVector);
-	//float Dir = CrossProduct.Z;
-
-	//if (direction > 0.0f)
-	//{
-	//	AnimIn->WalkAngle = AngleDegrees;
-	//}
-	//else if (Dir < 0.0f)
-	//{
-	//	AnimIn->WalkAngle = -AngleDegrees;
-	//}
-	//else
-	//{
-	//	AnimIn->WalkAngle = 0.0f;
-	//}
-
-	//UE_LOG(LogTemp, Log, TEXT("%f"), AngleDegrees);
 }
 

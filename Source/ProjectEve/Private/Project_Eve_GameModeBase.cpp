@@ -6,7 +6,7 @@
 
 AProject_Eve_GameModeBase::AProject_Eve_GameModeBase()
 {
-	PlayerControllerClass = AProject_Eve_PlayerController::StaticClass();
+	PlayerControllerClass = APlayerController::StaticClass();
 
 	ConstructorHelpers::FClassFinder<APawn> pawn(L"/Script/Engine.Blueprint'/Game/Blueprint/BP_Eve.BP_Eve_C'");
 	if (pawn.Succeeded())

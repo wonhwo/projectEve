@@ -11,6 +11,7 @@
 #include "Components/CapsuleComponent.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "Project_Eve_PlayerController.h"
+#include "DataManagerComponent.h"
 
 // Sets default values
 AEve::AEve()
@@ -38,6 +39,7 @@ AEve::AEve()
 	BaseComp = CreateDefaultSubobject<UCharacterBaseComponent>(TEXT("BaseComp"));
 	ActionComp = CreateDefaultSubobject<UActionComponent>(TEXT("ActionComp"));
 	MoveComp = CreateDefaultSubobject<UChracterMoveComponent>(TEXT("MoveComp"));
+	DataManager = CreateDefaultSubobject<UDataManagerComponent>(TEXT("DataManage"));
 }
 
 // Called when the game starts or when spawned
@@ -45,7 +47,6 @@ void AEve::BeginPlay()
 {
 	Super::BeginPlay();
 	APlayerController* playerContoller=Cast<APlayerController>(GetController());
-
 	UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(playerContoller->GetLocalPlayer());
 
 	if (subSys)
