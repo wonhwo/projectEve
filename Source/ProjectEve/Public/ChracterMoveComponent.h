@@ -48,7 +48,8 @@ private:
 
     float PreviousSpeed;
 
-    float Acceleration; //°¡¼Óµµ
+	float Acceleration;
+
 
 
 protected:
@@ -73,6 +74,7 @@ private:
 	void StartSprint();
 
 
+
 public:
 	UPROPERTY(EditDefaultsOnly,Category="Input")
 	class UInputAction* IA_L_Stick;
@@ -88,4 +90,7 @@ public:
 
 		UPROPERTY(EditDefaultsOnly,Category="Input")
 	class UInputAction* IA_R_StickClick;
+
+	bool isTurn = false;
+
 };

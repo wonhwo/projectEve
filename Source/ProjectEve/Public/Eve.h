@@ -57,6 +57,8 @@ public:
 	UPROPERTY(EditDefaultsOnly,Category="Input")
 	class UInputMappingContext* IMC_Eve;
 
+	class APlayerController* playerContoller;
+
 
 
 

@@ -31,6 +31,7 @@ private:
 	class UMontageDataAsset* DataAsset;
 
 	class UDataManagerComponent* DataComp;
+
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Movement")
 	float WalkForward=0.0f;
@@ -45,20 +46,21 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Movement")
 	float StickAngle=0.0f;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Movement")
-	EMoveState MoveState;
+	EMoveState MoveState = EMoveState::IDLE;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Movement")
 	float PreviousSpeed = 0.0f;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Movement")
+	float footPostion;
 
 
-	EMoveState movementType= EMoveState::IDLE;
 
 public:
+
 	UFUNCTION()
-	void AnimNotify_IdleState();
-
-
-
+	void AnimNotify_TurnEnd();
 
 	void PlayMontage(EMontageType type);
+
+	void getFootPosition();
 
 };

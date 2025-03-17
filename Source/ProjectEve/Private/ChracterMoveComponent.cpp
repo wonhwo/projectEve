@@ -42,7 +42,7 @@ void UChracterMoveComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		FVector WorldDirection = FTransform(Eve->GetControlRotation()).TransformVector(Direction);
 		WorldDirection.Z = 0;
 		WorldDirection.Normalize();
-		Eve->AddMovementInput(WorldDirection,Direction.Size());
+		    Eve->AddMovementInput(WorldDirection,Direction.Size());
 
 		Direction = FVector::ZeroVector;
 
@@ -63,7 +63,6 @@ void UChracterMoveComponent::TickComponent(float DeltaTime, ELevelTick TickType,
             Acceleration = 0.f;
         }
     }
-    Anim->PreviousSpeed = PreviousSpeed;
 
 }
 void UChracterMoveComponent::SetupInputBinding(class UEnhancedInputComponent* input)
@@ -99,10 +98,29 @@ void UChracterMoveComponent::LookUp(const struct FInputActionValue& InputValue)
 void UChracterMoveComponent::Move(const struct FInputActionValue& InputValue)
 {
     FVector2D values = InputValue.Get<FVector2D>();
-    Direction.X = values.Y; // Forward
-    Direction.Y = values.X; // Right
+    Direction.X = values.Y;
+    Direction.Y = values.X;
+    if(Anim->MoveState==EMoveState::RUN){
+    if (FMath::Abs(AngleDifference)>= 150) {
+        if (isTurn) return;
+        isTurn = true;
 
-    if (Direction.SizeSquared() > 0.0f)
+		Anim->MoveState = EMoveState::TURN;
+        Eve->GetCharacterMovement()->GroundFriction = 0;
+            FTimerHandle handler;
+        auto changeState = [this]() {
+            if (Anim->MoveState == EMoveState::WALK|| Anim->MoveState == EMoveState::RUN) return;
+            Eve->GetCharacterMovement()->GroundFriction = 8;
+            Anim->MoveState = EMoveState::WALK;
+            isTurn = false;
+            Eve->GetCharacterMovement()->MaxWalkSpeed = 1200;
+
+            };
+        GetWorld()->GetTimerManager().SetTimer(handler, changeState, 0.6f, false);
+    }
+    }
+
+    if (Direction.SizeSquared() > 0.2f)
     {
         FVector CharacterForward = Eve->GetActorForwardVector();
         CurrentCharacterAngle = FMath::Atan2(CharacterForward.Y, CharacterForward.X);
@@ -133,7 +151,7 @@ void UChracterMoveComponent::Move(const struct FInputActionValue& InputValue)
         }
     }
 
-    if (StickMagnitude <= 0.5f)
+    if (StickMagnitude <= 0.3f)
     {
         isRun = true;
         currentTime = 0.0f;
@@ -144,7 +162,7 @@ void UChracterMoveComponent::Move(const struct FInputActionValue& InputValue)
 void UChracterMoveComponent::RunCheck()
 {
 	if (isRun)return;
-	Eve->GetCharacterMovement()->MaxWalkSpeed = 1600;
+	Eve->GetCharacterMovement()->MaxWalkSpeed = 1200;
 
 }
 
@@ -155,14 +173,25 @@ void UChracterMoveComponent::Jump()
 
 void UChracterMoveComponent::OnMoveStarted(const FInputActionValue& Value)
 {
-    if(Anim->movementType==EMoveState::IDLE)
-	    Anim->movementType = EMoveState::WALK;
+	    Anim->MoveState = EMoveState::WALK;
 }
 
 void UChracterMoveComponent::Movestop()
 {
-    if (Anim->movementType == EMoveState::WALK)
-	    Anim->movementType = EMoveState::STOP;
+    if (Anim->MoveState == EMoveState::WALK|| Anim->MoveState == EMoveState::RUN) {
+        if (isTurn)return;
+        Anim->getFootPosition();
+        Anim->MoveState = EMoveState::STOP;
+        Anim->PreviousSpeed = Anim->Speed;
+
+    }
+
+    FTimerHandle handler;
+    auto changeState = [this]() {
+        if (Anim->MoveState == EMoveState::WALK) return;
+        Anim->MoveState = EMoveState::IDLE;
+        };
+    GetWorld()->GetTimerManager().SetTimer(handler, changeState, 1.0f,false);
 }
 
 void UChracterMoveComponent::StartSprint()

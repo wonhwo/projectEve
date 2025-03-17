@@ -46,7 +46,7 @@ AEve::AEve()
 void AEve::BeginPlay()
 {
 	Super::BeginPlay();
-	APlayerController* playerContoller=Cast<APlayerController>(GetController());
+	playerContoller=Cast<APlayerController>(GetController());
 	UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(playerContoller->GetLocalPlayer());
 
 	if (subSys)
@@ -57,6 +57,7 @@ void AEve::BeginPlay()
 void AEve::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 
 }
 

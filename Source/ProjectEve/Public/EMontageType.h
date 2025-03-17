@@ -10,7 +10,7 @@
 UENUM(BlueprintType)
 enum class EMontageType : uint8
 {
-    Movement,
-    Action,
+    Sprint_Turn_L,
+    Sprint_Turn_R,
     Weapon
 };
