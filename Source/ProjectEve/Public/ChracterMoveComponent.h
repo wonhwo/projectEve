@@ -25,15 +25,33 @@ protected:
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+public:
+	float getCharacterAngle() { return CurrentCharacterAngle; };
+	float getInputAngle() { return StickMagnitude; };
+	float getAngleDifference() { return AngleDifference; };
+
 private:
 	float currentTime=0.0f;
 
 	bool isRun = true;
 
-	EMoveState MoveState = EMoveState::STOP;
+	float CurrentCharacterAngle=0.0f;
 
-	FVector InputPlayerVector;
-	FVector InputCamVector;
+	float InputAngle =0.0f;
+
+	float AngleDifference =0.0f;
+
+	float StickMagnitude = 0.0f;
+
+    FVector PreviousVelocity;
+
+    float PreviousSpeed;
+
+	float Acceleration;
+
+
+
 protected:
 	//인풋 바인딩 함수
 	void SetupInputBinding(class UEnhancedInputComponent* input) override;
@@ -49,12 +67,12 @@ private:
 
 	void Jump();
 
-	void Movestart();
+	void OnMoveStarted(const FInputActionValue& Value);
 
 	void Movestop();
 
-	UFUNCTION(BlueprintCallable, Category = "Movement")
-	void GetMovementAngle();
+	void StartSprint();
+
 
 
 public:
@@ -66,4 +84,13 @@ public:
 
 	UPROPERTY(EditDefaultsOnly,Category="Input")
 	class UInputAction* IA_Jump;
+
+		UPROPERTY(EditDefaultsOnly,Category="Input")
+	class UInputAction* IA_L_StickClick;
+
+		UPROPERTY(EditDefaultsOnly,Category="Input")
+	class UInputAction* IA_R_StickClick;
+
+	bool isTurn = false;
+
 };

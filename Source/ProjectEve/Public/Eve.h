@@ -42,6 +42,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UChracterMoveComponent* MoveComp;
+	UPROPERTY(EditAnywhere)
+    class UDataManagerComponent* DataManager;
 
 	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* springArmComp;
@@ -54,6 +56,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly,Category="Input")
 	class UInputMappingContext* IMC_Eve;
+
+	class APlayerController* playerContoller;
 
 
 

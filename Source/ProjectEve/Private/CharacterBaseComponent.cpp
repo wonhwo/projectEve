@@ -37,6 +37,7 @@ void UCharacterBaseComponent::BeginPlay()
 	Super::BeginPlay();
 	Eve = Cast<AEve>(GetOwner());
 	Anim = Cast<UAnimEve>(Eve->GetMesh()->GetAnimInstance());
+
 	// ...
 
 }
